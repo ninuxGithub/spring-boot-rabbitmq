@@ -1,20 +1,20 @@
 package com.example.demo;
 
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +38,8 @@ public class RabbitMQApp {
 		connectionFactory.setPassword("admin");
 		connectionFactory.setVirtualHost("/VirtualHost");
 		connectionFactory.setPublisherConfirms(true); // 必须要设置
+		connectionFactory.setExecutor(Executors.newFixedThreadPool(5));
+		logger.info("config Rabbitmq ConnectionFactory successfully....");
 		return connectionFactory;
 	}
 
@@ -73,24 +75,21 @@ public class RabbitMQApp {
 	public Binding binding() {
 		return BindingBuilder.bind(queue()).to(defaultExchange()).with(ROUTINGKEY);
 	}
+	
+	
+	@Autowired
+	private RabbitCallbackListener rabbitCallbackListener;
 
 	@Bean
 	public SimpleMessageListenerContainer messageContainer() {
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory());
 		container.setQueues(queue());
 		container.setExposeListenerChannel(true);
-		container.setMaxConcurrentConsumers(1);
-		container.setConcurrentConsumers(1);
+		container.setMaxConcurrentConsumers(3);
+		container.setConcurrentConsumers(2);
 		container.setAcknowledgeMode(AcknowledgeMode.MANUAL); // 设置确认模式手工确认
-		container.setMessageListener(new ChannelAwareMessageListener() {
-
-			public void onMessage(Message message, com.rabbitmq.client.Channel channel) throws Exception {
-				byte[] body = message.getBody();
-				logger.info("收到消息 : [{}] index: {}", new String(body), SendMessageService.index.incrementAndGet());
-				channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // 确认消息成功消费
-			}
-
-		});
+		container.setRabbitAdmin(new RabbitAdmin(connectionFactory()));
+		container.setMessageListener(rabbitCallbackListener);
 		return container;
 	}
 
@@ -100,18 +99,21 @@ public class RabbitMQApp {
 	}
 
 	// add
-	@Bean
-	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-		RabbitTemplate template = new RabbitTemplate(connectionFactory);
-		template.setMessageConverter(new Jackson2JsonMessageConverter());
-		return template;
-	}
-
-	@Bean
-	public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-		SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-		factory.setConnectionFactory(connectionFactory);
-		factory.setMessageConverter(new Jackson2JsonMessageConverter());
-		return factory;
-	}
+	// @Bean
+	// public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory)
+	// {
+	// RabbitTemplate template = new RabbitTemplate(connectionFactory);
+	// template.setMessageConverter(new Jackson2JsonMessageConverter());
+	// return template;
+	// }
+	//
+	// @Bean
+	// public SimpleRabbitListenerContainerFactory
+	// rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+	// SimpleRabbitListenerContainerFactory factory = new
+	// SimpleRabbitListenerContainerFactory();
+	// factory.setConnectionFactory(connectionFactory);
+	// factory.setMessageConverter(new Jackson2JsonMessageConverter());
+	// return factory;
+	// }
 }

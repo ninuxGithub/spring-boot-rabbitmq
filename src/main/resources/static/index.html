@@ -1,12 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>indexPage</title>
+	<meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<title>indexPage</title>
+	<script type="text/javascript">
+	
+		$(function(){
+			$("#btn").click(function(){
+				$.ajax({
+					url:'/sendMsg',
+					type:'post',
+					data:{"name":'java', "age":18, "uuid":uuid()},
+					dataType:'json',
+					success:function(jsonData){
+						console.dir(jsonData)
+						$('#msg').html(JSON.stringify(jsonData))
+					}
+				});
+			});
+		});
+
+
+		function uuid() {
+		    var s = [];
+		    var hexDigits = "0123456789abcdef";
+		    for (var i = 0; i < 36; i++) {
+		        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+		    }
+		    s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+		    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+		    s[8] = s[13] = s[18] = s[23] = "-";
+		 
+		    var uuid = s.join("");
+		    return uuid;
+		}
+	</script>
 </head>
 <body>
-
-RabbitMQ
-
+<div class="container">
+	<div class="panel panel-default">
+		<div class="panel-heading text-center">
+			<h2>RabbitMQ</h2>
+		</div>
+		<div class="panel-body">
+			<button id="btn">Rquest RabbitMQ</button>
+		</div>
+		<div class="panel-footer">
+			<div id="msg"></div>
+		</div>
+	</div>
+</div>
 </body>
 </html>
