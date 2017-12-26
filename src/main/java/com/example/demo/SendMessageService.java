@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
-import com.rabbitmq.client.BasicProperties;
 
 @Component
 public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback*/ {
