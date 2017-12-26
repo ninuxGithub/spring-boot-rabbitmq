@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.service;
 
 import java.io.IOException;
 
@@ -8,6 +8,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.config.RabbitConfig;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
@@ -19,7 +20,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener{
 
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception {
-		channel.basicConsume(RabbitMQApp.QUEUENAME, false,"consumerTag", new DefaultConsumer(channel){
+		channel.basicConsume(RabbitConfig.QUEUENAME, false,"consumerTag", new DefaultConsumer(channel){
 
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {

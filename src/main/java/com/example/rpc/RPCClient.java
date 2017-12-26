@@ -18,11 +18,11 @@ public class RPCClient {
 
 	public RPCClient() throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost("192.168.1.100");
+		factory.setHost("10.1.51.96");
 		factory.setPort(5672);
 		factory.setUsername("admin");
 		factory.setPassword("admin");
-		factory.setVirtualHost("/VirtualHost");
+		factory.setVirtualHost("/");
 		connection = factory.newConnection();
 		channel = connection.createChannel();
 

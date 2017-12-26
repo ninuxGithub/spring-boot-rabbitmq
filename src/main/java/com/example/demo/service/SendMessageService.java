@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.service;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.User;
+import com.example.demo.config.RabbitConfig;
 
 @Component
 public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback*/ {
@@ -37,7 +39,7 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 
 	public void sendMsg(String content) {
 		CorrelationData correlationId = new CorrelationData(UUID.randomUUID().toString());
-		rabbitTemplate.convertAndSend(RabbitMQApp.EXCHANGE, RabbitMQApp.ROUTINGKEY, content, correlationId);
+		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, content, correlationId);
 	}
 
 
@@ -51,7 +53,7 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		/**
 		 * convertAndSend 可以传递Object参数
 		 */
-		rabbitTemplate.convertAndSend(RabbitMQApp.EXCHANGE, RabbitMQApp.ROUTINGKEY, json, correlationData);
+		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, json, correlationData);
 	}
 	/**
 	 * 发送对象类型的数据
@@ -59,7 +61,7 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 	public Object sendAndReceive(User user) {
 		CorrelationData correlationData = new CorrelationData(user.getUuid());
 		String json = JSONObject.toJSONString(user);
-		return rabbitTemplate.sendAndReceive(RabbitMQApp.EXCHANGE, RabbitMQApp.ROUTINGKEY, new Message(json.getBytes(), new MessageProperties()), correlationData);
+		return rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, new Message(json.getBytes(), new MessageProperties()), correlationData);
 	}
 	
 	
