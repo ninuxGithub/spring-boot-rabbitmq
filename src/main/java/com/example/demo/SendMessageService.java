@@ -48,6 +48,10 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 	public void sendMsg(User user) {
 		CorrelationData correlationData = new CorrelationData(user.getUuid());
 		String json = JSONObject.toJSONString(user);
+		
+		/**
+		 * convertAndSend 可以传递Object参数
+		 */
 		rabbitTemplate.convertAndSend(RabbitMQApp.EXCHANGE, RabbitMQApp.ROUTINGKEY, json, correlationData);
 	}
 	/**

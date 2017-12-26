@@ -33,10 +33,12 @@ public class RabbitMQApp {
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-		connectionFactory.setAddresses("192.168.1.100:5672");
+
+		// connectionFactory.setAddresses("192.168.1.100:5672");
+		connectionFactory.setAddresses("10.1.51.96:5672");
 		connectionFactory.setUsername("admin");
 		connectionFactory.setPassword("admin");
-		connectionFactory.setVirtualHost("/VirtualHost");
+		connectionFactory.setVirtualHost("/");
 		connectionFactory.setPublisherConfirms(true); // 必须要设置
 		connectionFactory.setExecutor(Executors.newFixedThreadPool(5));
 		logger.info("config Rabbitmq ConnectionFactory successfully....");
@@ -48,6 +50,7 @@ public class RabbitMQApp {
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public RabbitTemplate rabbitTemplate() {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
+		rabbitTemplate.setReplyTimeout(2000);
 		return rabbitTemplate;
 
 	}
@@ -57,8 +60,7 @@ public class RabbitMQApp {
 	 * 
 	 * 
 	 * FanoutExchange: 将消息分发到所有的绑定队列，无routingkey的概念 HeadersExchange
-	 * ：通过添加属性key-value匹配 DirectExchange:按照routingkey分发到指定队列
-	 * TopicExchange:多关键字匹配
+	 * ：通过添加属性key-value匹配 DirectExchange:按照routingkey分发到指定队列 TopicExchange:多关键字匹配
 	 */
 	@Bean
 	public DirectExchange defaultExchange() {
@@ -75,8 +77,7 @@ public class RabbitMQApp {
 	public Binding binding() {
 		return BindingBuilder.bind(queue()).to(defaultExchange()).with(ROUTINGKEY);
 	}
-	
-	
+
 	@Autowired
 	private RabbitCallbackListener rabbitCallbackListener;
 
@@ -98,22 +99,18 @@ public class RabbitMQApp {
 
 	}
 
-	// add
-	// @Bean
-	// public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory)
-	// {
-	// RabbitTemplate template = new RabbitTemplate(connectionFactory);
-	// template.setMessageConverter(new Jackson2JsonMessageConverter());
-	// return template;
-	// }
-	//
-	// @Bean
-	// public SimpleRabbitListenerContainerFactory
-	// rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-	// SimpleRabbitListenerContainerFactory factory = new
-	// SimpleRabbitListenerContainerFactory();
-	// factory.setConnectionFactory(connectionFactory);
-	// factory.setMessageConverter(new Jackson2JsonMessageConverter());
-	// return factory;
-	// }
+	/*@Bean
+	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+		RabbitTemplate template = new RabbitTemplate(connectionFactory);
+		template.setMessageConverter(new Jackson2JsonMessageConverter());
+		return template;
+	}
+
+	@Bean
+	public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+		SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		factory.setMessageConverter(new Jackson2JsonMessageConverter());
+		return factory;
+	}*/
 }
