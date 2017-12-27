@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 
 	private RabbitTemplate rabbitTemplate;
 
-	public static volatile AtomicInteger index = new AtomicInteger(0);
 
 	/**
 	 * 构造方法注入

@@ -26,9 +26,25 @@ public class MessageController {
 	@RequestMapping(value = "/sendMsg", method = RequestMethod.POST)
 	public User postMessage(User user) {
 		user.setId(18l);
+		
+		//异步将消息传递出去
+		/*new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				sendMessageService.sendMsg(user);
+			}
+		}).start();*/
+		
 		sendMessageService.sendMsg(user);
 		//System.out.println(sendMessageService.sendAndReceive(user));
 		//sendMessageService.convertAndSend(user);
+		
 		return user;
 	}
 
