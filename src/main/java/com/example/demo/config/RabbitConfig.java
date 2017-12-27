@@ -41,6 +41,7 @@ public class RabbitConfig {
 		connectionFactory.setVirtualHost("/");
 		connectionFactory.setPublisherConfirms(true); // 必须要设置
 		connectionFactory.setExecutor(Executors.newFixedThreadPool(5));
+		connectionFactory.setChannelCacheSize(100);
 		logger.info("config Rabbitmq ConnectionFactory successfully....");
 		return connectionFactory;
 	}

@@ -28,6 +28,7 @@ public class MessageController {
 		user.setId(18l);
 		sendMessageService.sendMsg(user);
 		//System.out.println(sendMessageService.sendAndReceive(user));
+		//sendMessageService.convertAndSend(user);
 		return user;
 	}
 

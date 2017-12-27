@@ -64,6 +64,11 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		return rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, new Message(json.getBytes(), new MessageProperties()), correlationData);
 	}
 	
+	public void convertAndSend(User user) {
+		CorrelationData correlationData = new CorrelationData(user.getUuid());
+		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE,RabbitConfig.ROUTINGKEY, user, correlationData);
+	}
+	
 	
 //	/**
 //	 * 回调
