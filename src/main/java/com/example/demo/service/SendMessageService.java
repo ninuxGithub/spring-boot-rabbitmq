@@ -21,7 +21,7 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 	private static final Logger logger = LoggerFactory.getLogger(SendMessageService.class);
 
 	private RabbitTemplate rabbitTemplate;
-
+	
 
 	/**
 	 * 构造方法注入
