@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -28,7 +29,7 @@ public class MinaConnection {
 	private MinaSocketConfig minaSocketConfig;
 	
 	@Autowired
-	private ReceiveMinaHandle receiveMinaHandle;
+	private MinaClientHandler minaClientHandler;
 	
 	/**
 	 * 通过mina发送消息
@@ -36,7 +37,7 @@ public class MinaConnection {
 	 */
 	public void minaSendMessage(Object message) {
 		IoConnector connector = new NioSocketConnector();
-		connector.setHandler(receiveMinaHandle);
+		connector.setHandler(minaClientHandler);
 		// 编写过滤器
 		connector.getFilterChain().addLast("codec",
 						new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"),
@@ -53,7 +54,10 @@ public class MinaConnection {
 			// 获取session
 			session = connect.getSession();
 			try {
-				session.write(message.toString());
+				WriteFuture write = session.write(message.toString());
+				if(write.isDone()) {
+					
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}			
@@ -73,7 +77,7 @@ public class MinaConnection {
 
 	public IoSession getMinaSession() {
 		IoConnector connector = new NioSocketConnector();
-		connector.setHandler(new ReceiveMinaHandle());
+		connector.setHandler(new MinaServerHandler());
 		/**默认是一分钟*/
 		// 设置连接超时时间 分钟
 		//connector.setConnectTimeout(30000);
@@ -110,7 +114,7 @@ public class MinaConnection {
 
 	public void connectionTest() {
 		IoConnector connector = new NioSocketConnector();
-		connector.setHandler(new ReceiveMinaHandle());
+		connector.setHandler(new MinaServerHandler());
 		// 设置连接超时时间 分钟
 		connector.setConnectTimeoutMillis(1);
 		// 添加过滤器和日志组件

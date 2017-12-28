@@ -11,7 +11,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
-import com.example.demo.core.ReceiveMinaHandle;
+import com.example.demo.core.MinaServerHandler;
 
 public class MinaClient {
 	private static final String HOST = "127.0.0.1";
@@ -20,7 +20,7 @@ public class MinaClient {
     @SuppressWarnings("deprecation")
 	public static void main(String[] args) {
         IoConnector connector = new NioSocketConnector();
-        connector.setHandler(new ReceiveMinaHandle());
+        connector.setHandler(new MinaServerHandler());
         // 设置连接超时时间 单位毫秒   
         connector.setConnectTimeout(30000);   
         //添加过滤器和日志组件

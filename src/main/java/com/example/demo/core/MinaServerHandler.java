@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 /**
  * socket接收处理类
  */
-public class ReceiveMinaHandle extends IoHandlerAdapter {
-	private static Logger logger = LoggerFactory.getLogger(ReceiveMinaHandle.class);
+public class MinaServerHandler extends IoHandlerAdapter {
+	private static Logger logger = LoggerFactory.getLogger(MinaServerHandler.class);
 
-	public ReceiveMinaHandle() {
+	public MinaServerHandler() {
 		logger.info("ReceiveMinaHandle init");
 	}
 
@@ -20,6 +20,7 @@ public class ReceiveMinaHandle extends IoHandlerAdapter {
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		try {
 			logger.info(String.format("ReceiveMinaHandle 接收到消息 : %s", message.toString()));
+			session.write("received...");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

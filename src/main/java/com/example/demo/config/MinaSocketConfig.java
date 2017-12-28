@@ -22,8 +22,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.demo.core.MinaClientHandler;
 import com.example.demo.core.MinaCodeFactory;
-import com.example.demo.core.ReceiveMinaHandle;
+import com.example.demo.core.MinaServerHandler;
 
 /**
  * mina配置
@@ -148,8 +149,12 @@ public class MinaSocketConfig {
 	}
 
 	@Bean
-	public ReceiveMinaHandle receiveMinaHandler() {
-		return new ReceiveMinaHandle();
+	public MinaServerHandler receiveMinaHandler() {
+		return new MinaServerHandler();
+	}
+	@Bean
+	public MinaClientHandler minaClientHandler() {
+		return new MinaClientHandler();
 	}
 
 	@Bean
