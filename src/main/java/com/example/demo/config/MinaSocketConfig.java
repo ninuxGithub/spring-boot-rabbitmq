@@ -72,7 +72,7 @@ public class MinaSocketConfig {
 
 			@Override
 			public boolean isRequest(IoSession session, Object message) {
-				logger.info("请求心跳包信息: " + message);
+				//logger.info("请求心跳包信息: " + message);
 				if (message.equals(heartBeatRequest))
 					return true;
 				return false;
@@ -80,7 +80,7 @@ public class MinaSocketConfig {
 
 			@Override
 			public boolean isResponse(IoSession session, Object message) {
-				logger.info("响应心跳包信息: " + message);
+				//logger.info("响应心跳包信息: " + message);
 				if (message.equals(heartBeatResponse))
 					return true;
 				return false;
@@ -88,14 +88,14 @@ public class MinaSocketConfig {
 
 			@Override
 			public Object getRequest(IoSession session) {
-				logger.info("请求预设信息: " + heartBeatRequest);
+				//logger.info("请求预设信息: " + heartBeatRequest);
 				/** 返回预设语句 */
 				return heartBeatRequest;
 			}
 
 			@Override
 			public Object getResponse(IoSession session, Object request) {
-				logger.info("响应预设信息: " + heartBeatResponse);
+				//logger.info("响应预设信息: " + heartBeatResponse);
 				/** 返回预设语句 */
 				return heartBeatResponse;
 			}

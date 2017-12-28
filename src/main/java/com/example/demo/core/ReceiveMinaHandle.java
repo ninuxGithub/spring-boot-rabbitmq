@@ -19,7 +19,7 @@ public class ReceiveMinaHandle extends IoHandlerAdapter {
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		try {
-			logger.info(String.format("message : %s", message.toString()));
+			logger.info(String.format("ReceiveMinaHandle 接收到消息 : %s", message.toString()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -24,6 +24,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener {
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception {
 		if (null == message) {
+			// 这个代码没有用到，只是为了测试的时候使用的
 			channel.basicConsume(RabbitConfig.QUEUENAME, false, "consumerTag", new DefaultConsumer(channel) {
 
 				@Override
@@ -45,8 +46,9 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener {
 			});
 		}
 
+		//rabbitmq 接受消息的监听器------>真正接收消息的地方
 		byte[] body = message.getBody();
-		System.out.println("receive msg : " + new String(body));
+		logger.info("receive msg : " + new String(body));
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // 确认消息成功消费
 
 	}
