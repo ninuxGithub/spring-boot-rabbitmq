@@ -20,7 +20,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		try {
 			logger.info(String.format("ReceiveMinaHandle 接收到消息 : %s", message.toString()));
-			session.write("received...");
+			session.write("[mina server received message successfully]");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
