@@ -33,7 +33,7 @@ public class ReceiveMinaHandle extends IoHandlerAdapter {
 
 	@Override
 	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-		logger.info(String.format("session [%s] ,status [%s]", session.getId(), status.toString()));
+		logger.info(String.format("sessionIdle session [%s] ,status [%s]", session.getId(), status.toString()));
 		super.sessionIdle(session, status);
 	}
 

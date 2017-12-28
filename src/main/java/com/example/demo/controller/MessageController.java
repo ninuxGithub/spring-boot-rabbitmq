@@ -32,7 +32,10 @@ public class MessageController {
 	private SendMessageService sendMessageService;	
 	
 	@Autowired
-	MinaSocketConfig minaSocketConfig;
+	private MinaSocketConfig minaSocketConfig;
+	
+	@Autowired
+	private ReceiveMinaHandle receiveMinaHandle;
 
 	// http://localhost:8080/sendMsg
 	@RequestMapping(value = "/sendMsg", method = RequestMethod.GET)
@@ -52,7 +55,7 @@ public class MessageController {
 		
 		/**测试mina发送消息*/
 		IoConnector connector = new NioSocketConnector();
-		connector.setHandler(new ReceiveMinaHandle());
+		connector.setHandler(receiveMinaHandle);
 		// 设置连接超时时间 分钟
 		connector.setConnectTimeout(3000);
 		// 编写过滤器
@@ -70,10 +73,15 @@ public class MessageController {
 			connect.awaitUninterruptibly();
 			// 获取session
 			session = connect.getSession();
-			session.write("客户端连接测试成功!");
-			session.write(user.toString());			
+			try {
+				//session.write("客户端连接测试成功!");
+				session.write(user.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}			
 		} catch (Exception e) {
 			logger.error("客户端连接异常");
+			e.printStackTrace();
 		}finally {
 			if(null != session) {
 				//session.getCloseFuture().awaitUninterruptibly(); //---> 除非主动关闭server端

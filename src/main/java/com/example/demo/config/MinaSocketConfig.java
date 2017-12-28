@@ -12,6 +12,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.keepalive.KeepAliveFilter;
 import org.apache.mina.filter.keepalive.KeepAliveMessageFactory;
+import org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -28,70 +29,96 @@ import com.example.demo.core.ReceiveMinaHandle;
  * mina配置
  */
 @Configuration
-@ConfigurationProperties(prefix="mina")
+@ConfigurationProperties(prefix = "mina")
 public class MinaSocketConfig {
+	private static final Logger logger = LoggerFactory.getLogger(MinaSocketConfig.class);
 
 	private static int port;
 
-	private static final Logger logger = LoggerFactory.getLogger(MinaSocketConfig.class);
+	/** 30秒后超时 */
+	private static int idelTimeout;
+	/** 15秒发送一次心跳包 */
+	private static int heartBeatRate;
+	/** 心跳包内容 */
+	private static String heartBeatRequest;
+	
+	private static String heartBeatResponse;
 
-//	private Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new HashMap<>();
-//	@Bean
-//	public CustomEditorConfigurer customEditorConfigurer() {
-//		customEditors.put(SocketAddress.class, InetSocketAddressEditor.class);
-//		CustomEditorConfigurer customEditorConfigurer = new CustomEditorConfigurer();
-//		customEditorConfigurer.setCustomEditors(customEditors);
-//		return customEditorConfigurer;
-//	}
+	// private Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new
+	// HashMap<>();
+	// @Bean
+	// public CustomEditorConfigurer customEditorConfigurer() {
+	// customEditors.put(SocketAddress.class, InetSocketAddressEditor.class);
+	// CustomEditorConfigurer customEditorConfigurer = new CustomEditorConfigurer();
+	// customEditorConfigurer.setCustomEditors(customEditors);
+	// return customEditorConfigurer;
+	// }
 
 	@Bean(initMethod = "bind", destroyMethod = "unbind")
 	public NioSocketAcceptor nioSocketAcceptor() {
+		logger.info("[nioSocketAcceptor begin to init]");
 		NioSocketAcceptor nioSocketAcceptor = new NioSocketAcceptor();
 		nioSocketAcceptor.setDefaultLocalAddress(new InetSocketAddress(getPort()));
 		nioSocketAcceptor.setReuseAddress(true);
 		nioSocketAcceptor.setFilterChainBuilder(defaultIoFilterChainBuilder());
 		nioSocketAcceptor.setHandler(receiveMinaHandler());
 		// 设置读取数据的缓冲区大小
-		//nioSocketAcceptor.getSessionConfig().setReadBufferSize(2048);
-        // 读写通道10秒内无操作进入空闲状态
-		//nioSocketAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
-		
-		//kaf.setKeepAliveRequestInterval(30); 
-		
-		/*********************************加入心跳**************************************************/
-        /**检测每一个连接的IoSession的心跳包，定时进入Idle状态，用一下方法，以上备注不可行**/
-        KeepAliveMessageFactory kamfi = new KeepAliveMessageFactory();
-        KeepAliveFilter kaf = new KeepAliveFilter(kamfi);
-        kaf.setRequestInterval(30);
-        nioSocketAcceptor.getFilterChain().addLast("heart", kaf);
-        /***************************************************************************************/
-		
+		 nioSocketAcceptor.getSessionConfig().setReadBufferSize(2048);
+		// 读写通道30秒内无操作进入空闲状态
+		 nioSocketAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, idelTimeout);
+
+		/********************************* 加入心跳**************************************************/
+		KeepAliveMessageFactory kamfi = new KeepAliveMessageFactory() {
+
+			@Override
+			public boolean isRequest(IoSession session, Object message) {
+				logger.info("请求心跳包信息: " + message);
+				if (message.equals(heartBeatRequest))
+					return true;
+				return false;
+			}
+
+			@Override
+			public boolean isResponse(IoSession session, Object message) {
+				logger.info("响应心跳包信息: " + message);
+				if (message.equals(heartBeatResponse))
+					return true;
+				return false;
+			}
+
+			@Override
+			public Object getRequest(IoSession session) {
+				logger.info("请求预设信息: " + heartBeatRequest);
+				/** 返回预设语句 */
+				return heartBeatRequest;
+			}
+
+			@Override
+			public Object getResponse(IoSession session, Object request) {
+				logger.info("响应预设信息: " + heartBeatResponse);
+				/** 返回预设语句 */
+				return heartBeatResponse;
+			}
+		};
+
+
+		KeepAliveFilter heartBeat = new KeepAliveFilter(kamfi, IdleStatus.BOTH_IDLE, new KeepAliveRequestTimeoutHandler() {
+
+			@Override
+			public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
+				logger.info("KeepAliveRequestTimeoutHandler: [心跳超时了]");
+			}
+			
+		});
+		// 设置是否forward到下一个filter
+		heartBeat.setForwardEvent(true);
+		// 设置心跳频率
+		heartBeat.setRequestInterval(heartBeatRate);
+		nioSocketAcceptor.getFilterChain().addLast("heartbeat", heartBeat);
+		/***************************************************************************************/
+
 		return nioSocketAcceptor;
 	}
-	class KeepAliveMessageFactory implements org.apache.mina.filter.keepalive.KeepAliveMessageFactory{
-
-		@Override
-		public boolean isRequest(IoSession session, Object message) {
-			return false;
-		}
-
-		@Override
-		public boolean isResponse(IoSession session, Object message) {
-			return false;
-		}
-
-		@Override
-		public Object getRequest(IoSession session) {
-			return null;
-		}
-
-		@Override
-		public Object getResponse(IoSession session, Object request) {
-			return null;
-		}
-		
-	}
-	
 
 	@Bean
 	public DefaultIoFilterChainBuilder defaultIoFilterChainBuilder() {
@@ -119,12 +146,12 @@ public class MinaSocketConfig {
 	public ProtocolCodecFilter protocolCodecFilter() {
 		return new ProtocolCodecFilter(minaCodeFactory());
 	}
-	
+
 	@Bean
 	public ReceiveMinaHandle receiveMinaHandler() {
 		return new ReceiveMinaHandle();
 	}
-	
+
 	@Bean
 	public MinaCodeFactory minaCodeFactory() {
 		return new MinaCodeFactory();
@@ -139,8 +166,41 @@ public class MinaSocketConfig {
 		return port;
 	}
 
-	@SuppressWarnings("static-access")
-	public void setPort(int port) {
-		this.port = port;
+	public static void setPort(int port) {
+		MinaSocketConfig.port = port;
 	}
+
+	public static int getIdelTimeout() {
+		return idelTimeout;
+	}
+
+	public static void setIdelTimeout(int idelTimeout) {
+		MinaSocketConfig.idelTimeout = idelTimeout;
+	}
+
+	public static int getHeartBeatRate() {
+		return heartBeatRate;
+	}
+
+	public static void setHeartBeatRate(int heartBeatRate) {
+		MinaSocketConfig.heartBeatRate = heartBeatRate;
+	}
+
+	public static String getHeartBeatRequest() {
+		return heartBeatRequest;
+	}
+
+	public static void setHeartBeatRequest(String heartBeatRequest) {
+		MinaSocketConfig.heartBeatRequest = heartBeatRequest;
+	}
+
+	public static String getHeartBeatResponse() {
+		return heartBeatResponse;
+	}
+
+	public static void setHeartBeatResponse(String heartBeatResponse) {
+		MinaSocketConfig.heartBeatResponse = heartBeatResponse;
+	}
+	
+	
 }
