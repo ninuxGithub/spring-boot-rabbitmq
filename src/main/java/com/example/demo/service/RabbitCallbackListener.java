@@ -6,10 +6,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.support.MessagePropertiesConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.User;
 import com.example.demo.config.RabbitConfig;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -20,6 +28,11 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener {
 	private static final Logger logger = LoggerFactory.getLogger(RabbitCallbackListener.class);
 
 	public static volatile AtomicInteger index = new AtomicInteger(0);
+	@Autowired
+	private MessagePropertiesConverter messagePropertiesConverter;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception {
@@ -46,9 +59,36 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener {
 			});
 		}
 
-		//rabbitmq 接受消息的监听器------>真正接收消息的地方
+		// rabbitmq 接受消息的监听器------>真正接收消息的地方
 		byte[] body = message.getBody();
-		logger.info("receive msg : " + new String(body));
+		String json = new String(body);
+		User user = JSONObject.parseObject(json, User.class);
+		if (user.getId().longValue() == 100) {
+			MessageProperties messageProperties = message.getMessageProperties();
+			AMQP.BasicProperties rabbitMQProperties = messagePropertiesConverter
+					.fromMessageProperties(messageProperties, "UTF-8");
+			String numberContent = null;
+			numberContent = new String(message.getBody(), "UTF-8");
+			System.out.println("The received number is:" + numberContent);
+			String consumerTag = messageProperties.getConsumerTag();
+			// int number = Integer.parseInt(numberContent);
+
+			String result = "result";// factorial(number);
+
+			AMQP.BasicProperties replyRabbitMQProps = new AMQP.BasicProperties("text/plain", "UTF-8", null, 2, 0,
+					rabbitMQProperties.getCorrelationId(), null, null, null, null, null, null, consumerTag, null);
+//			Envelope replyEnvelope = new Envelope(messageProperties.getDeliveryTag(), true,
+//					RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY);
+
+			MessageProperties replyMessageProperties = messagePropertiesConverter
+					.toMessageProperties(replyRabbitMQProps, null, "UTF-8");
+
+			Message replyMessage = MessageBuilder.withBody(result.getBytes()).andProperties(replyMessageProperties)
+					.build();
+
+			rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY, replyMessage);
+		}
+		logger.info("[RabbitMQ] receive msg : " + json);
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // 确认消息成功消费
 
 	}

@@ -73,7 +73,7 @@ public class MinaSocketConfig {
 
 			@Override
 			public boolean isRequest(IoSession session, Object message) {
-				logger.info("请求心跳包信息: " + message);
+				//logger.info("请求心跳包信息: " + message);
 				if (message.equals(heartBeatRequest))
 					return true;
 				return false;
@@ -81,7 +81,7 @@ public class MinaSocketConfig {
 
 			@Override
 			public boolean isResponse(IoSession session, Object message) {
-				logger.info("响应心跳包信息: " + message);
+				//logger.info("响应心跳包信息: " + message);
 				if (message.equals(heartBeatResponse))
 					return true;
 				return false;
@@ -128,7 +128,7 @@ public class MinaSocketConfig {
 		filters.put("executor", executorFilter());
 		filters.put("mdcInjectionFilter", mdcInjectionFilter());
 		filters.put("codecFilter", protocolCodecFilter());
-		filters.put("loggingFilter", loggingFilter());
+		//filters.put("loggingFilter", loggingFilter());
 		defaultIoFilterChainBuilder.setFilters(filters);
 		return defaultIoFilterChainBuilder;
 	}

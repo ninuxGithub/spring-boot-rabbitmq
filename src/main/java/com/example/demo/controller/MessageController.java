@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,20 @@ public class MessageController {
 		
 		//System.out.println(sendMessageService.sendAndReceive(user));
 		//sendMessageService.convertAndSend(user);
+		
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/sendReply", method = RequestMethod.POST)
+	public User sendReply(User user) {
+		user.setId(100l);
+		
+		/**测试RabbitMQ发送消息*/
+		Message replyMessage = sendMessageService.sendReply(user);
+		System.out.println(replyMessage);
+		
+		return user;
 		
 	}
 

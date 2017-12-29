@@ -48,12 +48,12 @@ public class MinaConnection {
 				new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"),
 						LineDelimiter.WINDOWS.getValue(), LineDelimiter.WINDOWS.getValue())));
 
-		connector.getFilterChain().addLast("logging", new LoggingFilter());
+		//connector.getFilterChain().addLast("logging", new LoggingFilter());
 		KeepAliveMessageFactory kamfi = new KeepAliveMessageFactory() {
 
 			@Override
 			public boolean isRequest(IoSession session, Object message) {
-				 logger.info("请求心跳包信息: " + message);
+				 //logger.info("请求心跳包信息: " + message);
 				if (message.equals(minaSocketConfig.getHeartBeatRequest()))
 					return true;
 				return false;
@@ -61,7 +61,7 @@ public class MinaConnection {
 
 			@Override
 			public boolean isResponse(IoSession session, Object message) {
-				 logger.info("响应心跳包信息: " + message);
+				 //logger.info("响应心跳包信息: " + message);
 				if (message.equals(minaSocketConfig.getHeartBeatResponse()))
 					return true;
 				return false;
