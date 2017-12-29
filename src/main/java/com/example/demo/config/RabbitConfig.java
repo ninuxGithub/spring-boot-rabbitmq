@@ -128,7 +128,6 @@ public class RabbitConfig {
 	@Bean
 	public Queue queue() {
 		return new Queue(QUEUENAME, true); // 队列持久
-
 	}
 
 	@Bean

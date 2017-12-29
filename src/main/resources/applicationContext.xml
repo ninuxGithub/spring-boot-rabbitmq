@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.7.xsd">
+
+	<!-- <bean id="rabbitCallbackListner" class="com.example.demo.service.RabbitCallbackListener"/> -->
+
+	<!-- <bean id="serializerMessageConverter" class="org.springframework.amqp.support.converter.SerializerMessageConverter"></bean>
+	
+	<rabbit:listener-container message-converter="serializerMessageConverter" connection-factory="connectionFactory">
+		<rabbit:listener ref="rabbitCallbackListner" queue-names="replyQueueName"/>
+	</rabbit:listener-container>
+	
+	<context:annotation-config/>  
+   
+    <context:property-placeholder  
+        ignore-unresolvable="true" location="classpath*:/application.properties" />      
+   
+    <context:component-scan base-package="com.example.demo"  />    
+   
+    <rabbit:annotation-driven container-factory="rabbitListenerContainerFactory" />  
+   
+    <bean id="rabbitMQConnectionFactory" class="com.rabbitmq.client.ConnectionFactory">  
+        <property name="username" value="${spring.rabbitmq.username}" />  
+        <property name="password" value="${spring.rabbitmq.password}" />  
+        <property name="host" value="${spring.rabbitmq.host}" />  
+        <property name="port" value="${spring.rabbitmq.port}" />  
+        <property name="virtualHost" value="${spring.rabbitmq.virutalHost}" />  
+        <property name="automaticRecoveryEnabled" value="false" />  
+        <property name="topologyRecoveryEnabled" value="false" />  
+        <property name="networkRecoveryInterval" value="60000" />  
+    </bean>  
+   
+    <rabbit:connection-factory id ="connectionFactory"  
+        connection-factory="rabbitMQConnectionFactory"  
+        connection-timeout="10000"  
+        cache-mode="CHANNEL"  
+        channel-cache-size="20"/>  
+   
+    <bean id="rabbitListenerContainerFactory"  
+        class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">  
+        <property name="connectionFactory" ref="connectionFactory"/>  
+        <property name="concurrentConsumers" value="3"/>  
+        <property name="maxConcurrentConsumers" value="3"/>  
+    </bean>  
+   
+    <rabbit:admin id="rabbitAdmin"  connection-factory="connectionFactory" auto-startup="true"/>   -->
+</beans>

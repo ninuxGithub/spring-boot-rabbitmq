@@ -93,11 +93,13 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		//sendMessage.getMessageProperties().setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
 		Message replyMessage=null;
 		try {
+			rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
 			replyMessage = 
 					rabbitTemplate.sendAndReceive(RabbitConfig.SEND_EXCHANGE_NAME, 
 							RabbitConfig.SEND_MESSAGE_KEY,sendMessage);
 		} catch (Exception e) {
 			replyMessage = new Message(e.getMessage().getBytes(), new MessageProperties());
+			e.printStackTrace();
 		}
 		return replyMessage;
 	}

@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
 
 import com.example.demo.config.MinaSocketConfig;
 
+
 @SpringBootApplication
-public class RabbitMQApp implements CommandLineRunner{
-	
+@ImportResource("applicationContext.xml")
+public class RabbitMQApp implements CommandLineRunner{	
 	private static final Logger logger = LoggerFactory.getLogger(RabbitMQApp.class);
 	
 	@Autowired
