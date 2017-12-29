@@ -91,8 +91,8 @@ public class RabbitConfig {
 		rabbitTemplate.setUseTemporaryReplyQueues(false);
 		rabbitTemplate.setMessageConverter(getMessageConverter());
 		rabbitTemplate.setMessagePropertiesConverter(getMessagePropertiesConverter());
-//		rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
-//		rabbitTemplate.setReceiveTimeout(60000);
+		rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
+		rabbitTemplate.setReceiveTimeout(60000);
 		return rabbitTemplate;
 	}
 
@@ -215,7 +215,8 @@ public class RabbitConfig {
 	public SimpleMessageListenerContainer createReplyListenerContainer() {
 		SimpleMessageListenerContainer listenerContainer = new SimpleMessageListenerContainer();
 		listenerContainer.setConnectionFactory(getConnectionFactory());
-		listenerContainer.setQueues(queue());
+		//listenerContainer.setQueues(createReplyQueue(getRabbitAdmin()),queue(),createQueue(getRabbitAdmin()));
+		listenerContainer.setQueueNames(RabbitConfig.REPLY_QUEUE_NAME,RabbitConfig.QUEUENAME, RabbitConfig.SEND_QUEUE_NAME);
 		listenerContainer.setMessageListener(rabbitCallbackListener);
 		listenerContainer.setMessageConverter(getMessageConverter());
 		listenerContainer.setMessagePropertiesConverter(getMessagePropertiesConverter());

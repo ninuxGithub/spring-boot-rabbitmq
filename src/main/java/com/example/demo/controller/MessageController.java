@@ -59,8 +59,10 @@ public class MessageController {
 		
 		/**测试RabbitMQ发送消息*/
 		Message replyMessage = sendMessageService.sendReply(user);
-		System.out.println(replyMessage);
-		
+		if(null != replyMessage) {
+			user = new User();
+			user.setName(new String(replyMessage.getBody()));
+		}
 		return user;
 		
 	}

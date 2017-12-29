@@ -78,7 +78,7 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		CorrelationData correlationData = new CorrelationData(user.getUuid());
 		String json = JSONObject.toJSONString(user);
 		BasicProperties basicProperties = new BasicProperties("text/plain", "UTF-8", null, 2, 0,
-				correlationData.toString(), RabbitConfig.REPLY_EXCHANGE_NAME, 
+				correlationData.toString(), RabbitConfig.REPLY_QUEUE_NAME, 
 				null, null, new Date(), null, null, "SpringProducer",null);
 
 		MessageProperties messageProperties = messagePropertiesConverter.toMessageProperties(basicProperties, null,"UTF-8");
@@ -86,11 +86,19 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		messageProperties.setReceivedRoutingKey(RabbitConfig.REPLY_MESSAGE_KEY);
 		messageProperties.setRedelivered(true);
 
-		Message sendMessage = MessageBuilder.withBody(json.getBytes()).andProperties(messageProperties).build();
-		Message replyMessage = rabbitTemplate.sendAndReceive(RabbitConfig.SEND_EXCHANGE_NAME, 
-				RabbitConfig.SEND_MESSAGE_KEY,sendMessage,correlationData);
-//		Message replyMessage = rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, 
-//				RabbitConfig.ROUTINGKEY,new Message(json.getBytes(), new MessageProperties()),correlationData);
+		Message sendMessage = 
+				MessageBuilder.withBody(json.getBytes())
+				.andProperties(messageProperties)
+				.build();
+		//sendMessage.getMessageProperties().setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+		Message replyMessage=null;
+		try {
+			replyMessage = 
+					rabbitTemplate.sendAndReceive(RabbitConfig.SEND_EXCHANGE_NAME, 
+							RabbitConfig.SEND_MESSAGE_KEY,sendMessage);
+		} catch (Exception e) {
+			replyMessage = new Message(e.getMessage().getBytes(), new MessageProperties());
+		}
 		return replyMessage;
 	}
 	
