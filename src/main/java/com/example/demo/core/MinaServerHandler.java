@@ -1,5 +1,8 @@
 package com.example.demo.core;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -11,6 +14,16 @@ import org.slf4j.LoggerFactory;
  */
 public class MinaServerHandler extends IoHandlerAdapter {
 	private static Logger logger = LoggerFactory.getLogger(MinaServerHandler.class);
+	
+	
+	ThreadLocal<DateTimeFormatter> timeFormatter = new ThreadLocal<DateTimeFormatter>() {
+
+		@Override
+		protected DateTimeFormatter initialValue() {
+			return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		}
+		
+	};
 
 	public MinaServerHandler() {
 		logger.info("ReceiveMinaHandle init");
@@ -20,7 +33,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		try {
 			logger.info(String.format("ReceiveMinaHandle 接收到消息 : %s", message.toString()));
-			session.write("[mina server received message successfully]");
+			session.write(timeFormatter.get().format(LocalDateTime.now()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
