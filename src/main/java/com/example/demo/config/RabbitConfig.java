@@ -93,6 +93,9 @@ public class RabbitConfig {
 		rabbitTemplate.setMessagePropertiesConverter(getMessagePropertiesConverter());
 		rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
 		rabbitTemplate.setReceiveTimeout(60000);
+		rabbitTemplate.setConfirmCallback(rabbitCallbackListener);
+		rabbitTemplate.setReturnCallback(rabbitCallbackListener);
+		rabbitTemplate.setMandatory(true);
 		return rabbitTemplate;
 	}
 
