@@ -26,6 +26,11 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+/**
+ * 消息接收
+ * 消息确认
+ * 以及route错误后返回的消息
+ */
 @Component
 public class RabbitCallbackListener implements ChannelAwareMessageListener, ConfirmCallback, ReturnCallback {
 	private static final Logger logger = LoggerFactory.getLogger(RabbitCallbackListener.class);
@@ -37,8 +42,18 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 
+	/**
+	 * basic.ack
+	 * basic.nack
+	 * basic.reject
+	 * 
+	 * 如果exchange 参数错误会报错
+	 * 
+	 * @param message
+	 * @param channel
+	 */
 	@Override
-	public void onMessage(Message message, Channel channel) throws Exception {
+	public void onMessage(Message message, Channel channel) {
 		try {
 			if (null == message) {
 				// 这个代码没有用到，只是为了测试的时候使用的
@@ -67,6 +82,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 			byte[] body = message.getBody();
 			String json = new String(body);
 			User user = JSONObject.parseObject(json, User.class);
+			//TODO 如何返回消息还不是很清楚
 			if (user.getId().longValue() == 100) {
 				MessageProperties messageProperties = message.getMessageProperties();
 				AMQP.BasicProperties rabbitMQProperties = messagePropertiesConverter
@@ -96,15 +112,20 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 			logger.info("[RabbitMQ] receive msg : " + json);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // 确认消息成功消费
 		} catch (Exception e) {
-			e.printStackTrace();
-			channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+			logger.info("[RabbitMQ] receive msg failed"+ e.getMessage());
+			try {
+				channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 
 		}
 
 	}
 
 	/**
-	 * 返回消息
+	 * 返回消息:如果rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, content, correlationId);
+	 * 的routeKey错误，那么returnedMessage会执行
 	 */
 	@SuppressWarnings("deprecation")
 	@Override
@@ -119,7 +140,9 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 	}
 
 	/**
-	 * 消息确认
+	 * 消息确认：都会执行的	 * 
+	 * 只是ack:true , 成功接收
+	 * 当ack:false, 没有接收到消息
 	 */
 	@Override
 	public void confirm(CorrelationData correlationData, boolean ack, String cause) {

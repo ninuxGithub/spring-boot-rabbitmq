@@ -20,7 +20,7 @@ import com.example.demo.config.RabbitConfig;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
 @Component
-public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback*/ {
+public class SendMessageService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SendMessageService.class);
 
@@ -28,7 +28,6 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 	
 	@Autowired
 	private MessagePropertiesConverter messagePropertiesConverter;
-	
 
 	/**
 	 * 构造方法注入
@@ -36,9 +35,6 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 	@Autowired
 	public SendMessageService(RabbitTemplate rabbitTemplate) {
 		this.rabbitTemplate = rabbitTemplate;
-		// rabbitTemplate如果为单例的话，那回调就是最后设置的内容
-//		this.rabbitTemplate.setConfirmCallback(this);
-//		this.rabbitTemplate.setReturnCallback(this);
 		logger.info("constructor init...");
 	}
 
@@ -58,7 +54,24 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		/**
 		 * convertAndSend 可以传递Object参数
 		 */
-		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, json, correlationData);
+		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY+"bb", json, correlationData);
+		
+		
+//		BasicProperties basicProperties = new BasicProperties("text/plain", "UTF-8", null, 2, 0,
+//				correlationData.toString(), RabbitConfig.REPLY_QUEUE_NAME, 
+//				null, null, new Date(), null, null, "SpringProducer",null);
+//
+//		MessageProperties messageProperties = messagePropertiesConverter.toMessageProperties(basicProperties, null,"UTF-8");
+//		messageProperties.setReceivedExchange(RabbitConfig.REPLY_EXCHANGE_NAME);
+//		messageProperties.setReceivedRoutingKey(RabbitConfig.REPLY_MESSAGE_KEY);
+//		messageProperties.setRedelivered(true);
+//		messageProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+		
+		MessageProperties basicProperties = new MessageProperties();
+		basicProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+		Message sendMessage = MessageBuilder.withBody(json.getBytes()).andProperties(basicProperties).build();
+		Message receiveMessage = rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, sendMessage, correlationData);
+		System.out.println(receiveMessage);
 	}
 	/**
 	 * 发送对象类型的数据
@@ -103,29 +116,5 @@ public class SendMessageService /*implements RabbitTemplate.ConfirmCallback, Rab
 		}
 		return replyMessage;
 	}
-	
-	
-//	/**
-//	 * 回调
-//	 */
-//	@Override
-//	public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-//		logger.info(" index : {} -- 回调correlationDataID:[{}]", index.get(), correlationData);
-//		if (ack) {
-//			logger.info("消息成功消费");
-//		} else {
-//			logger.info("消息消费失败:[{}]", cause);
-//		}
-//	}
-//
-//	@Override
-//	public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-//		logger.info("message:{}", new String(message.getBody()));
-//		logger.info("replyCode:{}", replyCode);
-//		logger.info("replyText:{}", replyText);
-//		logger.info("exchange:{}", exchange);
-//		logger.info("routingKey:{}", routingKey);
-//		
-//	}
 
 }
