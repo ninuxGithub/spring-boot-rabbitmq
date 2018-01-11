@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.bean.User;
 import com.example.demo.config.RabbitConfig;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
 @Component
@@ -54,7 +57,7 @@ public class SendMessageService {
 		/**
 		 * convertAndSend 可以传递Object参数
 		 */
-		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY+"bb", json, correlationData);
+		//rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY+"bb", json, correlationData);
 		
 		
 //		BasicProperties basicProperties = new BasicProperties("text/plain", "UTF-8", null, 2, 0,
@@ -67,11 +70,54 @@ public class SendMessageService {
 //		messageProperties.setRedelivered(true);
 //		messageProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
 		
-		MessageProperties basicProperties = new MessageProperties();
-		basicProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
-		Message sendMessage = MessageBuilder.withBody(json.getBytes()).andProperties(basicProperties).build();
-		Message receiveMessage = rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, sendMessage, correlationData);
-		System.out.println(receiveMessage);
+//		MessageProperties basicProperties = new MessageProperties();
+//		basicProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+//		Message sendMessage = MessageBuilder.withBody(json.getBytes()).andProperties(basicProperties).build();
+//		Collection<String> expectedQueueNames = rabbitTemplate.expectedQueueNames();
+//		System.out.println(expectedQueueNames);
+//		Message receiveMessage = rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, sendMessage, correlationData);
+//		System.out.println("[receiveMessage] : "+receiveMessage);
+		
+		
+		
+		Date sendTime = new Date();  
+        String correlationId = UUID.randomUUID().toString();  
+   
+   
+        AMQP.BasicProperties props =  
+                new AMQP.BasicProperties("text/plain",  
+                        "UTF-8",  
+                        null,  
+                        2,  
+                        0, correlationId, RabbitConfig.REPLY_EXCHANGE_NAME, null,  
+                        null, sendTime, null, null,  
+                        "SpringProducer", null);  
+   
+        MessageProperties sendMessageProperties =  
+                messagePropertiesConverter.toMessageProperties(props, null,"UTF-8");  
+        sendMessageProperties.setReceivedExchange(RabbitConfig.REPLY_EXCHANGE_NAME);  
+        sendMessageProperties.setReceivedRoutingKey(RabbitConfig.REPLY_MESSAGE_KEY);  
+        sendMessageProperties.setRedelivered(true);  
+   
+        Message sendMessage = MessageBuilder.withBody("20".getBytes())  
+                .andProperties(sendMessageProperties)  
+                .build();  
+   
+        rabbitTemplate.expectedQueueNames();
+        Message replyMessage =  
+                rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE,  RabbitConfig.ROUTINGKEY, sendMessage);  
+   
+        String replyMessageContent = null;  
+        try {  
+        	if(replyMessage != null) {
+        		
+        		replyMessageContent = new String(replyMessage.getBody(),"UTF-8");  
+        	}
+        } catch (UnsupportedEncodingException e) {  
+            e.printStackTrace();  
+        }finally {
+        	System.out.println("replyMessageContent"+replyMessageContent);
+        }
 	}
 	/**
 	 * 发送对象类型的数据
