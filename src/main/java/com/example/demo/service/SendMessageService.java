@@ -64,7 +64,7 @@ public class SendMessageService {
 		
 		//sendAndReceive 返回空
 		
-		//testSendAndReceiveMessage(correlationData, json);
+		testSendAndReceiveMessage(correlationData, json);
 	}
 
 	

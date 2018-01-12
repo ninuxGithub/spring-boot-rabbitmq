@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,36 +76,8 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 			
 			
 			
-//			MessageProperties messageProperties = message.getMessageProperties();  
-//	        AMQP.BasicProperties rabbitMQProperties =  
-//	                messagePropertiesConverter.fromMessageProperties(messageProperties, "UTF-8");  
-//	        String numberContent = null;  
-//	        numberContent = new String(message.getBody(),"UTF-8");  
-//	        System.out.println("The received number is:" + numberContent);  
-//	        String consumerTag = messageProperties.getConsumerTag();  
-//	   
-//	        String result = "100";  
-//	   
-//	        AMQP.BasicProperties replyRabbitMQProps =  
-//	                new AMQP.BasicProperties("text/plain",  
-//	                        "UTF-8",  
-//	                        null,  
-//	                        2,  
-//	                        0, rabbitMQProperties.getCorrelationId(), null, null,  
-//	                        null, null, null, null,  
-//	                        consumerTag, null);  
-//	        Envelope replyEnvelope =  
-//	                new Envelope(messageProperties.getDeliveryTag(), true, RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY);  
-//	   
-//	        MessageProperties replyMessageProperties =  
-//	                messagePropertiesConverter.toMessageProperties(replyRabbitMQProps,  
-//	                        replyEnvelope,"UTF-8");  
-//	   
-//	        Message replyMessage = MessageBuilder.withBody(result.getBytes())  
-//	                .andProperties(replyMessageProperties)  
-//	                .build();  
-//	   
-//	        rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME,RabbitConfig.REPLY_MESSAGE_KEY, replyMessage);  
+			callback(message);  
+			
 		} catch (Exception e2) {
 			logger.warn("[RabbitMQ]  reply failed " + e2.getMessage());
 		}
@@ -122,6 +95,39 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 
 		}
 
+	}
+
+	private void callback(Message message) throws UnsupportedEncodingException {
+		MessageProperties messageProperties = message.getMessageProperties();  
+		AMQP.BasicProperties rabbitMQProperties =  
+		        messagePropertiesConverter.fromMessageProperties(messageProperties, "UTF-8");  
+		String numberContent = null;  
+		numberContent = new String(message.getBody(),"UTF-8");  
+		System.out.println("The received number is:" + numberContent);  
+		String consumerTag = messageProperties.getConsumerTag();  
+   
+		String result = "100";  
+   
+		AMQP.BasicProperties replyRabbitMQProps =  
+		        new AMQP.BasicProperties("text/plain",  
+		                "UTF-8",  
+		                null,  
+		                2,  
+		                0, rabbitMQProperties.getCorrelationId(), null, null,  
+		                null, null, null, null,  
+		                consumerTag, null);  
+		Envelope replyEnvelope =  
+		        new Envelope(messageProperties.getDeliveryTag(), true, RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY);  
+   
+		MessageProperties replyMessageProperties =  
+		        messagePropertiesConverter.toMessageProperties(replyRabbitMQProps,  
+		                replyEnvelope,"UTF-8");  
+   
+		Message replyMessage = MessageBuilder.withBody(result.getBytes())  
+		        .andProperties(replyMessageProperties)  
+		        .build();  
+   
+		rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME,RabbitConfig.REPLY_MESSAGE_KEY, replyMessage);
 	}
 
 	/**
