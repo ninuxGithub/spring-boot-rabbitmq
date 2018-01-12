@@ -14,6 +14,10 @@
 	  		> -->init()--->open()
 	  2.bind()方法是定义在接口IoAcceptor中的,
 	  		bind-->AbstractPollingIoAcceptor.bindInternal()-->startupAcceptor()-->executeWorker()
+	  		
+	  		
+	  		
+访问地址：http://localhost:8080/sendMsg	  		
 	  
 	 
 

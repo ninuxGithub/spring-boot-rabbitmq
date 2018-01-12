@@ -57,29 +57,24 @@ public class SendMessageService {
 		/**
 		 * convertAndSend 可以传递Object参数
 		 */
-		//rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY+"bb", json, correlationData);
+		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, json, correlationData);
+		
+		//from :http://blog.csdn.net/u011126891/article/details/54376179 
 		
 		
-//		BasicProperties basicProperties = new BasicProperties("text/plain", "UTF-8", null, 2, 0,
-//				correlationData.toString(), RabbitConfig.REPLY_QUEUE_NAME, 
-//				null, null, new Date(), null, null, "SpringProducer",null);
-//
-//		MessageProperties messageProperties = messagePropertiesConverter.toMessageProperties(basicProperties, null,"UTF-8");
-//		messageProperties.setReceivedExchange(RabbitConfig.REPLY_EXCHANGE_NAME);
-//		messageProperties.setReceivedRoutingKey(RabbitConfig.REPLY_MESSAGE_KEY);
-//		messageProperties.setRedelivered(true);
-//		messageProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+		//sendAndReceive 返回空
 		
-//		MessageProperties basicProperties = new MessageProperties();
-//		basicProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
-//		Message sendMessage = MessageBuilder.withBody(json.getBytes()).andProperties(basicProperties).build();
-//		Collection<String> expectedQueueNames = rabbitTemplate.expectedQueueNames();
-//		System.out.println(expectedQueueNames);
-//		Message receiveMessage = rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, sendMessage, correlationData);
-//		System.out.println("[receiveMessage] : "+receiveMessage);
-		
-		
-		
+		//testSendAndReceiveMessage(correlationData, json);
+	}
+
+	
+	//TODO 有待探索
+	/***
+	 * 测试发送并且接受消息的回复
+	 * @param correlationData
+	 * @param json
+	 */
+	private void testSendAndReceiveMessage(CorrelationData correlationData, String json) {
 		Date sendTime = new Date();  
         String correlationId = UUID.randomUUID().toString();  
    
@@ -99,13 +94,13 @@ public class SendMessageService {
         sendMessageProperties.setReceivedRoutingKey(RabbitConfig.REPLY_MESSAGE_KEY);  
         sendMessageProperties.setRedelivered(true);  
    
-        Message sendMessage = MessageBuilder.withBody("20".getBytes())  
+        Message sendMessage = MessageBuilder.withBody(json.getBytes())  
                 .andProperties(sendMessageProperties)  
                 .build();  
    
-        rabbitTemplate.expectedQueueNames();
+        rabbitTemplate.expectedQueueNames(); //this.isListener = true; 不然会报错：RabbitTemplate is not configured as MessageListener -
         Message replyMessage =  
-                rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE,  RabbitConfig.ROUTINGKEY, sendMessage);  
+                rabbitTemplate.sendAndReceive(RabbitConfig.EXCHANGE,  RabbitConfig.ROUTINGKEY, sendMessage,correlationData);  
    
         String replyMessageContent = null;  
         try {  
@@ -116,7 +111,7 @@ public class SendMessageService {
         } catch (UnsupportedEncodingException e) {  
             e.printStackTrace();  
         }finally {
-        	System.out.println("replyMessageContent"+replyMessageContent);
+        	System.out.println("replyMessageContent "+replyMessageContent);
         }
 	}
 	/**

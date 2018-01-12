@@ -52,10 +52,10 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 
 		try {
 			// rabbitmq 接受消息的监听器------>真正接收消息的地方
-//			byte[] body = message.getBody();
-//			String json = new String(body);
-//			
-//			logger.info("[RabbitMQ] receive msg : " + json);
+			byte[] body = message.getBody();
+			String json = new String(body);
+			
+			logger.info("[RabbitMQ] receive msg : " + json);
 			
 			
 //			MessageProperties basicProperties = new MessageProperties();
@@ -75,36 +75,36 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 			
 			
 			
-			MessageProperties messageProperties = message.getMessageProperties();  
-	        AMQP.BasicProperties rabbitMQProperties =  
-	                messagePropertiesConverter.fromMessageProperties(messageProperties, "UTF-8");  
-	        String numberContent = null;  
-	        numberContent = new String(message.getBody(),"UTF-8");  
-	        System.out.println("The received number is:" + numberContent);  
-	        String consumerTag = messageProperties.getConsumerTag();  
-	   
-	        String result = "100";  
-	   
-	        AMQP.BasicProperties replyRabbitMQProps =  
-	                new AMQP.BasicProperties("text/plain",  
-	                        "UTF-8",  
-	                        null,  
-	                        2,  
-	                        0, rabbitMQProperties.getCorrelationId(), null, null,  
-	                        null, null, null, null,  
-	                        consumerTag, null);  
-	        Envelope replyEnvelope =  
-	                new Envelope(messageProperties.getDeliveryTag(), true, RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY);  
-	   
-	        MessageProperties replyMessageProperties =  
-	                messagePropertiesConverter.toMessageProperties(replyRabbitMQProps,  
-	                        replyEnvelope,"UTF-8");  
-	   
-	        Message replyMessage = MessageBuilder.withBody(result.getBytes())  
-	                .andProperties(replyMessageProperties)  
-	                .build();  
-	   
-	        rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME,RabbitConfig.REPLY_MESSAGE_KEY, replyMessage);  
+//			MessageProperties messageProperties = message.getMessageProperties();  
+//	        AMQP.BasicProperties rabbitMQProperties =  
+//	                messagePropertiesConverter.fromMessageProperties(messageProperties, "UTF-8");  
+//	        String numberContent = null;  
+//	        numberContent = new String(message.getBody(),"UTF-8");  
+//	        System.out.println("The received number is:" + numberContent);  
+//	        String consumerTag = messageProperties.getConsumerTag();  
+//	   
+//	        String result = "100";  
+//	   
+//	        AMQP.BasicProperties replyRabbitMQProps =  
+//	                new AMQP.BasicProperties("text/plain",  
+//	                        "UTF-8",  
+//	                        null,  
+//	                        2,  
+//	                        0, rabbitMQProperties.getCorrelationId(), null, null,  
+//	                        null, null, null, null,  
+//	                        consumerTag, null);  
+//	        Envelope replyEnvelope =  
+//	                new Envelope(messageProperties.getDeliveryTag(), true, RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY);  
+//	   
+//	        MessageProperties replyMessageProperties =  
+//	                messagePropertiesConverter.toMessageProperties(replyRabbitMQProps,  
+//	                        replyEnvelope,"UTF-8");  
+//	   
+//	        Message replyMessage = MessageBuilder.withBody(result.getBytes())  
+//	                .andProperties(replyMessageProperties)  
+//	                .build();  
+//	   
+//	        rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME,RabbitConfig.REPLY_MESSAGE_KEY, replyMessage);  
 		} catch (Exception e2) {
 			logger.warn("[RabbitMQ]  reply failed " + e2.getMessage());
 		}
@@ -145,7 +145,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 	 */
 	@Override
 	public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-		logger.info("[Product Confirm]:correlationData:" + correlationData + ",ack:" + ack + ",cause:" + cause);
+		logger.info("[Product Confirm]:correlationData:" + correlationData + ",ack:" + (ack?"接收消息成功":"接收消息失败") + ",cause:" + cause);
 	}
 
 }
