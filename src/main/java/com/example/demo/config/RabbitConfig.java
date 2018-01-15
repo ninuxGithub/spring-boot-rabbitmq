@@ -92,7 +92,7 @@ public class RabbitConfig {
 		rabbitTemplate.setMessageConverter(getMessageConverter());
 		rabbitTemplate.setMessagePropertiesConverter(getMessagePropertiesConverter());
 		rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
-		rabbitTemplate.setReceiveTimeout(6000);
+		rabbitTemplate.setReceiveTimeout(200);
 		rabbitTemplate.setConfirmCallback(rabbitCallbackListener);
 		rabbitTemplate.setReturnCallback(rabbitCallbackListener);
 //		rabbitTemplate.setChannelTransacted(true); //报错

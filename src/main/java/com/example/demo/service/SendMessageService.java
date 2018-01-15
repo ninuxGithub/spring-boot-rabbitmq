@@ -17,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bean.RabbitConfirmMessage;
 import com.example.demo.bean.User;
 import com.example.demo.config.RabbitConfig;
+import com.example.demo.repository.RabbitConfirmMessageRepository;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
@@ -31,6 +33,9 @@ public class SendMessageService {
 	
 	@Autowired
 	private MessagePropertiesConverter messagePropertiesConverter;
+	
+	@Autowired
+	private RabbitConfirmMessageRepository rabbitConfirmMessageRepository;
 
 	/**
 	 * 构造方法注入
@@ -59,12 +64,26 @@ public class SendMessageService {
 		 */
 		rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTINGKEY, json, correlationData);
 		
+		try {
+			Thread.sleep(600);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		//判断消息是否被成功的消费了,是根据数据库存储的消费记录来判断的
+		
+		RabbitConfirmMessage confirmMessage = rabbitConfirmMessageRepository.findByCorrelationData(correlationData.getId());
+		if(confirmMessage != null) {
+			System.err.println(correlationData.getId()+(confirmMessage.getAck()?"被成功消费了！":"消费失败"));
+		}
+		
+		
 		//from :http://blog.csdn.net/u011126891/article/details/54376179 
 		
 		
 		//sendAndReceive 返回空
 		
-		testSendAndReceiveMessage(correlationData, json);
+		//testSendAndReceiveMessage(correlationData, json);
 	}
 
 	
@@ -145,12 +164,14 @@ public class SendMessageService {
 				.andProperties(messageProperties)
 				.build();
 		//sendMessage.getMessageProperties().setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
+		rabbitTemplate.expectedQueueNames();
 		Message replyMessage=null;
 		try {
 			rabbitTemplate.setReplyAddress(RabbitConfig.REPLY_QUEUE_NAME);
 			replyMessage = 
 					rabbitTemplate.sendAndReceive(RabbitConfig.SEND_EXCHANGE_NAME, 
-							RabbitConfig.SEND_MESSAGE_KEY,sendMessage);
+							RabbitConfig.SEND_MESSAGE_KEY,sendMessage,correlationData);
+			System.err.println(replyMessage);
 		} catch (Exception e) {
 			replyMessage = new Message(e.getMessage().getBytes(), new MessageProperties());
 			e.printStackTrace();

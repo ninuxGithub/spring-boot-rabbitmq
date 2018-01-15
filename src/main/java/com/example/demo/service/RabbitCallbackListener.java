@@ -21,7 +21,9 @@ import org.springframework.amqp.rabbit.support.MessagePropertiesConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.bean.RabbitConfirmMessage;
 import com.example.demo.config.RabbitConfig;
+import com.example.demo.repository.RabbitConfirmMessageRepository;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
@@ -39,6 +41,9 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	
+	@Autowired
+	private RabbitConfirmMessageRepository rabbitConfirmMessageRepository;
 
 	/**
 	 * basic.ack basic.nack basic.reject
@@ -58,25 +63,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 			
 			logger.info("[RabbitMQ] receive msg : " + json);
 			
-			
-//			MessageProperties basicProperties = new MessageProperties();
-//			basicProperties.setReplyTo(RabbitConfig.REPLY_QUEUE_NAME);
-//			Message sendMessage = MessageBuilder.withBody("java is good language".getBytes()).andProperties(basicProperties).build();
-//			rabbitTemplate.send(RabbitConfig.REPLY_EXCHANGE_NAME, RabbitConfig.REPLY_MESSAGE_KEY, sendMessage);
-
-//			boolean receiveAndReply = rabbitTemplate.receiveAndReply(RabbitConfig.REPLY_QUEUE_NAME,new ReceiveAndReplyCallback<String, String>() {
-//
-//				@Override
-//				public String handle(String payload) {
-//					System.out.println(payload);
-//					return "i am reply message";
-//				}
-//			});
-//			System.err.println(receiveAndReply);
-			
-			
-			
-			callback(message);  
+			//callback(message);  
 			
 		} catch (Exception e2) {
 			logger.warn("[RabbitMQ]  reply failed " + e2.getMessage());
@@ -151,6 +138,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 	 */
 	@Override
 	public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+		rabbitConfirmMessageRepository.save(new RabbitConfirmMessage(correlationData.getId(), ack, cause));
 		logger.info("[Product Confirm]:correlationData:" + correlationData + ",ack:" + (ack?"接收消息成功":"接收消息失败") + ",cause:" + cause);
 	}
 

@@ -42,6 +42,8 @@ public class MessageController {
 		/**测试RabbitMQ发送消息*/
 		sendMessageService.sendMsg(user);
 		
+		
+		
 		/**测试mina发送消息*/
 		minaConnection.minaSendMessage(user);
 		return user;
