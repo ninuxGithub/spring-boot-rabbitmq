@@ -10,17 +10,21 @@
         <script type="text/javascript" src="./js/jquery-2.1.4.min.js"></script>
         <script type="text/javascript" src="./js/highstock/highstock.src.js"></script>
         <script type="text/javascript" src="./js/highstock/highcharts-zh_CN.js"></script>
+        <style type="text/css">
+        	text.highcharts-plot-line-label{
+        		background-color: red !important;
+        		width: 300px!important;
+        		height: 30px!important;
+        		color: green!important;
+        	}
+        	
+        	.highcharts-plot-band-label{
+        		background-color: red !important;
+        		color:red;
+        	}
+        	
+        </style>
         
-        
-<!--         <script type="text/javascript" src="./js/highstock/highcharts.js"></script> -->
-<!--         <script src="https://img.hcharts.cn/jquery/jquery-1.8.3.min.js"></script> -->
-<!--         <script src="https://img.hcharts.cn/highstock/highstock.js"></script> -->
-<!--         <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script> -->
-<!--         <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script> -->
-<!--         <script src="https://img.hcharts.cn/highcharts/modules/drag-panes.js"></script> -->
-
-<!-- 样式表 -->
-<!--         <script src="https://img.hcharts.cn/highcharts/themes/sand-signika.js"></script> -->
     </head>
     <body>
     
@@ -35,12 +39,15 @@
                     rangeSelectorZoom: '',
                     noData: '暂无数据'
                 }
+                
             });
+            
+        	 // create the chart	        
+	        var ohlc=[];	        
+	        $.ajaxSettings.async = false;
             $.getJSON('./js/data.json', function (data) {
-                console.dir(data)
                 data = data.klineData.klineData;
-                var ohlc = [],
-                    dataLength = data.length,
+                var   dataLength = data.length,
                     i = 0;
                 for (i; i < dataLength; i += 1) {
                 	//Date.UTC(year,month,day,hours,minutes,seconds,ms)
@@ -51,16 +58,21 @@
                         data[i][3], // low
                         data[i][4] // close
                     ]);
-                }
-                // create the chart
-                var hTML = document.documentElement;
-		        var dWidth = hTML.getBoundingClientRect().width;
-		        $('#container').highcharts('StockChart', {
-		            chart: {
-		                height: '250',
-		                width:dWidth*0.95,
-		                spacingBottom: 10
-		            },
+                }		        
+            });            
+            
+            var chartConfig={
+            		chart: {
+            			renderTo:'container',
+    	                height: '250',
+    	                width:dWidth*0.95,
+    	                spacingBottom: 10,
+    	                events: {
+    	                    redraw: function() {
+    	                        this.labelDraw(this);
+    	                    }
+    	                }
+    	            },
                     rangeSelector: {
                     	enabled:false,
                         selected: 1,
@@ -124,10 +136,11 @@
                                 text:'压力位52元',     //标签的内容
                                 align:'left',                //标签的水平位置，水平居左,默认是水平居中center
                                 x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
+                                y:-8,
                                 style:{
                                     fontSize:'12px',
                                     fontWeight:'bold',
-                                    color:'#FF5F07',
+                                    color:'white',
                                 }
                             }
                         },{
@@ -136,20 +149,15 @@
                             value:45,              //定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
                             width:2,               //标示线的宽度，2px
                             zIndex: 5,
-                            useHTML:true,
-                            //backGroundColor:'red',
                             label:{
-                                text:"<div style='background:red; width:50px;height:20px;color:pink;'>支撑位45元</div>",     //标签的内容
+                                text: '支撑位45元',
                                 align:'left',                //标签的水平位置，水平居左,默认是水平居中center
                                 x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
                                 y:14,
                                 style:{
                                     fontSize:'12px',
                                     fontWeight:'bold',
-                                    color:'#4A6893',
-                                    backgroundColor: '#4A6893',
-                                    width:"100px",
-                                    height:"20px"
+                                    color:'white',
                                 }
                             }
                         }]
@@ -164,8 +172,29 @@
                         data: ohlc,
                         zIndex: 10
                     }]
-                });
-            });
+            }
+            
+            var hTML = document.documentElement;
+	        var dWidth = hTML.getBoundingClientRect().width;
+            var chartObj = new Highcharts.StockChart( chartConfig, function (crt) {
+                labelDrawBack( crt );
+	        });
+	        chartObj.labelDraw = labelDrawBack;            
+            function labelDrawBack(crt) {
+            	var colorArr = ["#FF5F07","#4A6893"]
+            	for(var i=0; i<=1; i++){
+            		var textbox = crt.yAxis[ 0 ].plotLinesAndBands[i ].label;
+            		 var box = textbox.getBBox();
+                     labelBackground = crt.renderer.rect( box.x - 3, box.y + 1, box.width + 6, box.height, 3 ).attr( {
+                         fill: colorArr[i],
+                         id: 'labelBack',
+                         opacity: 0.95,
+                         'stroke-width': 0,
+                         zIndex: 4
+                     }).add();
+            	}
+            }
+            
         });
         
         
