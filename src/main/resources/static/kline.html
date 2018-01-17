@@ -24,7 +24,7 @@
     </head>
     <body>
     
-    <div id="container"></div>
+    <div id="container" style="border:1px solid red;"></div>
         <script type="text/javascript">
         $(function () {
             Highcharts.setOptions({
@@ -52,14 +52,13 @@
                         data[i][4] // close
                     ]);
                 }
-                ohlc = null;
                 // create the chart
                 var hTML = document.documentElement;
 		        var dWidth = hTML.getBoundingClientRect().width;
 		        $('#container').highcharts('StockChart', {
 		            chart: {
 		                height: '250',
-		                width:dWidth-dWidth/15*1.2,
+		                width:dWidth*0.95,
 		                spacingBottom: 10
 		            },
                     rangeSelector: {
@@ -126,7 +125,7 @@
                                 align:'left',                //标签的水平位置，水平居左,默认是水平居中center
                                 x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
                                 style:{
-                                    fontSize:'14px',
+                                    fontSize:'12px',
                                     fontWeight:'bold',
                                     color:'#FF5F07',
                                 }
@@ -145,7 +144,7 @@
                                 x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
                                 y:14,
                                 style:{
-                                    fontSize:'14px',
+                                    fontSize:'12px',
                                     fontWeight:'bold',
                                     color:'#4A6893',
                                     backgroundColor: '#4A6893',
