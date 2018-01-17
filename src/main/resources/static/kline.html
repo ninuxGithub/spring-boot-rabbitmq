@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+<!--         <link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico"> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            /* css 代码  */
+        </style>
+        <script type="text/javascript" src="./js/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="./js/highstock/highstock.src.js"></script>
+        <script type="text/javascript" src="./js/highstock/highcharts-zh_CN.js"></script>
+        
+        
+<!--         <script type="text/javascript" src="./js/highstock/highcharts.js"></script> -->
+<!--         <script src="https://img.hcharts.cn/jquery/jquery-1.8.3.min.js"></script> -->
+<!--         <script src="https://img.hcharts.cn/highstock/highstock.js"></script> -->
+<!--         <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script> -->
+<!--         <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script> -->
+<!--         <script src="https://img.hcharts.cn/highcharts/modules/drag-panes.js"></script> -->
+
+<!-- 样式表 -->
+<!--         <script src="https://img.hcharts.cn/highcharts/themes/sand-signika.js"></script> -->
+    </head>
+    <body>
+    
+    <div id="container"></div>
+        <script type="text/javascript">
+        $(function () {
+            Highcharts.setOptions({
+	           	global : {
+	                    useUTC : true
+	                },
+                lang: {
+                    rangeSelectorZoom: '',
+                    noData: '暂无数据'
+                }
+            });
+            $.getJSON('./js/data.json', function (data) {
+                console.dir(data)
+                data = data.klineData.klineData;
+                var ohlc = [],
+                    dataLength = data.length,
+                    i = 0;
+                for (i; i < dataLength; i += 1) {
+                	//Date.UTC(year,month,day,hours,minutes,seconds,ms)
+                    ohlc.push([
+                    	getDateUTC(data[i][0]), // the date
+                        data[i][1], // open
+                        data[i][2], // high
+                        data[i][3], // low
+                        data[i][4] // close
+                    ]);
+                }
+                ohlc = null;
+                // create the chart
+                var hTML = document.documentElement;
+		        var dWidth = hTML.getBoundingClientRect().width;
+		        $('#container').highcharts('StockChart', {
+		            chart: {
+		                height: '250',
+		                width:dWidth-dWidth/15*1.2,
+		                spacingBottom: 10
+		            },
+                    rangeSelector: {
+                    	enabled:false,
+                        selected: 1,
+                        inputDateFormat: '%Y-%m-%d'
+                    },
+                    navigator:{
+                    	enabled:false
+                    },
+                    scrollbar:{
+                    	enabled:false
+                    },
+                    exporting:{
+                    	enabled:false
+                    	
+                    },
+                    title: {
+                        text: ''
+                    },
+                    credits:{
+                    	text:''
+                    },
+                    xAxis: {
+                        dateTimeLabelFormats: {
+                            millisecond: '%H:%M:%S.%L',
+                            second: '%H:%M:%S',
+                            minute: '%H:%M',
+                            hour: '%H:%M',
+                            day: '%m-%d',
+                            week: '%m-%d',
+                            month: '%y-%m',
+                            year: '%Y'
+                        }
+                    },
+                    tooltip: {
+                        split: false,
+                        shared: true
+                    },
+                    yAxis: [{
+                    	//gridLineColor: 'white',
+                        labels: {
+                            align: 'right',
+                            x: 0
+                        },
+                        title: {
+                            text: ''
+                        },
+                        height: '100%',
+                        resize: {
+                            enabled: true
+                        },
+                        lineWidth: 0,
+                        opposite: false,
+                        zIndex:1,
+                        plotLines:[{
+                            color:'#FF5F07',            //线的颜色，定义为红色
+                            dashStyle:'dash',     //默认是值，这里定义为长虚线
+                            value:52,              //定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
+                            width:2,               //标示线的宽度，2px
+                            zIndex: 5,
+                            label:{
+                                text:'压力位52元',     //标签的内容
+                                align:'left',                //标签的水平位置，水平居左,默认是水平居中center
+                                x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
+                                style:{
+                                    fontSize:'14px',
+                                    fontWeight:'bold',
+                                    color:'#FF5F07',
+                                }
+                            }
+                        },{
+                            color:'#4A6893',            //线的颜色，定义为红色
+                            dashStyle:'dash',     //默认是值，这里定义为长虚线
+                            value:45,              //定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
+                            width:2,               //标示线的宽度，2px
+                            zIndex: 5,
+                            useHTML:true,
+                            //backGroundColor:'red',
+                            label:{
+                                text:"<div style='background:red; width:50px;height:20px;color:pink;'>支撑位45元</div>",     //标签的内容
+                                align:'left',                //标签的水平位置，水平居左,默认是水平居中center
+                                x:10,                         //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
+                                y:14,
+                                style:{
+                                    fontSize:'14px',
+                                    fontWeight:'bold',
+                                    color:'#4A6893',
+                                    backgroundColor: '#4A6893',
+                                    width:"100px",
+                                    height:"20px"
+                                }
+                            }
+                        }]
+                    }],
+                    series: [{
+                        type: 'candlestick',
+                        name: '平安银行',
+                        color: '#5AC699',
+                        lineColor: '#5AC699',
+                        upColor: '#FF5F07',
+                        upLineColor: '#FF5F07',
+                        data: ohlc,
+                        zIndex: 10
+                    }]
+                });
+            });
+        });
+        
+        
+        function getDateUTC(date){
+            var dArr = new Array();
+            date+="";
+            for(var hh=0;hh<3;hh++){
+                var numb ;
+                if(hh==0){
+                    numb = Number(date.slice(0,4));
+                }
+                else {
+                    numb= Number(date.slice((hh-1)*2+4,hh*2+4));
+                    };
+                dArr.push(numb);
+            }
+            var dateUTC = Number(Date.UTC(dArr[0],dArr[1],dArr[2],0,0));//得出的UTC时间
+            return dateUTC;
+        }
+        </script>
+    </body>
+</html>
+​

@@ -32,6 +32,14 @@ public class MessageController {
 	public String sendMessage() {
 		return "index";
 	}
+	@RequestMapping(value = "/klinePage", method = RequestMethod.GET)
+	public String kline() {
+		return "kline";
+	}
+	@RequestMapping(value = "/barPage", method = RequestMethod.GET)
+	public String bar() {
+		return "bar";
+	}
 	
 	
 	@ResponseBody

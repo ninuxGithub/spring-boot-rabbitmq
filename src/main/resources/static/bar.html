@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        </style>
+        <script type="text/javascript" src="./js/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="./js/highstock/highstock.src.js"></script>
+        <script type="text/javascript" src="./js/highstock/highcharts-zh_CN.js"></script>
+        
+        
+    </head>
+    <body>
+    
+    <div id="container" style="min-width:400px;height:400px"></div>
+        <script type="text/javascript">
+        $(function () {
+            $('#container').highcharts({
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: '全球各大城市人口排行'
+                },
+                subtitle: {
+                    text: '数据截止 2017-03'
+                },
+                xAxis: {
+                    type: 'category',
+                    labels: {
+                        rotation: 0,
+                        style: {
+                            fontSize: '13px',
+                            fontFamily: 'Verdana, sans-serif'
+                        }
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: '人口 (百万)'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    pointFormat: '人口总量: <b>{point.y:.1f} 百万</b>'
+                },
+                series: [{
+                    name: '总人口',
+                    data: [
+                        ['上海', 24.25],
+                        ['卡拉奇', 23.50],
+                        ['北京', 21.51],
+                        ['德里', 16.78],
+                        ['拉各斯', 16.06]
+                    ],
+                    dataLabels: {
+                        enabled: true,
+                        rotation: 0,
+                        color: '#FFFFFF',
+                        align: 'right',
+                        format: '{point.y:.1f}', // one decimal
+                        y: 10, // 10 pixels down from the top
+                        style: {
+                            fontSize: '13px',
+                            fontFamily: 'Verdana, sans-serif'
+                        }
+                    }
+                }]
+            });
+        });
+        </script>
+    </body>
+</html>
+​
