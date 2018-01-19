@@ -21,7 +21,7 @@
 
 
 ## kline
-![img](https://github.com/ninuxGithub/spring-amqp-test/blob/master/kline.png)	
+![img](https://github.com/ninuxGithub/spring-boot-rabbitmq/blob/master/kline.png)	
 	  
 	 
 
