@@ -17,7 +17,11 @@
 	  		
 	  		
 	  		
-访问地址：http://localhost:8080/sendMsg	  		
+访问地址：http://localhost:8080/sendMsg	  	
+
+
+## kline
+![img](https://github.com/ninuxGithub/spring-amqp-test/blob/master/kline.png)	
 	  
 	 
 

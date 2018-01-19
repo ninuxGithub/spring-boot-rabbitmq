@@ -59,7 +59,10 @@
                         data[i][4] // close
                     ]);
                 }		        
-            });            
+            });  
+            
+            var hTML = document.documentElement;
+	        var dWidth = hTML.getBoundingClientRect().width;
             
             var chartConfig={
             		chart: {
@@ -174,8 +177,7 @@
                     }]
             }
             
-            var hTML = document.documentElement;
-	        var dWidth = hTML.getBoundingClientRect().width;
+            
             var chartObj = new Highcharts.StockChart( chartConfig, function (crt) {
                 labelDrawBack( crt );
 	        });
