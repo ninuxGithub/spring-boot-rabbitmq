@@ -29,13 +29,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import com.example.demo.RabbitMQApp;
 import com.example.demo.service.RabbitCallbackListener;
 
 @Configuration
 @EnableConfigurationProperties(RabbitProperties.class)
 public class RabbitConfig {
-	private static final Logger logger = LoggerFactory.getLogger(RabbitMQApp.class);
+	private static final Logger logger = LoggerFactory.getLogger(RabbitConfig.class);
 
 	public static final String EXCHANGE = "my-exchange";
 

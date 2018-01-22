@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -83,7 +82,7 @@ public class SendMessageService {
 		
 		//sendAndReceive 返回空
 		
-		//testSendAndReceiveMessage(correlationData, json);
+//		testSendAndReceiveMessage(correlationData, json);
 	}
 
 	
@@ -93,7 +92,7 @@ public class SendMessageService {
 	 * @param correlationData
 	 * @param json
 	 */
-	private void testSendAndReceiveMessage(CorrelationData correlationData, String json) {
+	public void testSendAndReceiveMessage(CorrelationData correlationData, String json) {
 		Date sendTime = new Date();  
         String correlationId = UUID.randomUUID().toString();  
    

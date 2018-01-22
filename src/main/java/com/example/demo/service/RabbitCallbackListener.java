@@ -2,16 +2,13 @@ package com.example.demo.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.core.ReceiveAndReplyCallback;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
@@ -84,7 +81,7 @@ public class RabbitCallbackListener implements ChannelAwareMessageListener, Conf
 
 	}
 
-	private void callback(Message message) throws UnsupportedEncodingException {
+	public void callback(Message message) throws UnsupportedEncodingException {
 		MessageProperties messageProperties = message.getMessageProperties();  
 		AMQP.BasicProperties rabbitMQProperties =  
 		        messagePropertiesConverter.fromMessageProperties(messageProperties, "UTF-8");  
