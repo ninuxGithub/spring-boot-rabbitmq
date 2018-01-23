@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +39,7 @@ public class MessageController {
 	
 
 	// http://localhost:8080/sendMsg
-	@RequestMapping(value = "/sendMsg", method = RequestMethod.GET)
+	@RequestMapping(value = "/sendMsg", method = {RequestMethod.GET,RequestMethod.POST})
 	public String sendMessage() {
 		List<UserEntity> users = userRepository.findAll();
 		Map<String, UserEntity> callableCaculation = CallableUtil.callableCaculation("id", users);
