@@ -10,6 +10,7 @@
         <script type="text/javascript" src="./js/jquery-2.1.4.min.js"></script>
         <script type="text/javascript" src="./js/highstock/highstock.src.js"></script>
         <script type="text/javascript" src="./js/highstock/highcharts-zh_CN.js"></script>
+        <script type="text/javascript" src="./js/highstock/no-data-to-display.src.js"></script>
         <style type="text/css">
         	text.highcharts-plot-line-label{
         		background-color: red !important;
@@ -60,6 +61,8 @@
                     ]);
                 }		        
             });  
+            
+           // ohlc=[];
             
             var hTML = document.documentElement;
 	        var dWidth = hTML.getBoundingClientRect().width;
@@ -186,6 +189,10 @@
             	var colorArr = ["#FF5F07","#4A6893"]
             	for(var i=0; i<=1; i++){
             		var textbox = crt.yAxis[ 0 ].plotLinesAndBands[i ].label;
+            		console.dir(textbox)
+            		if(textbox == undefined){
+            			return;
+            		}
             		 var box = textbox.getBBox();
                      labelBackground = crt.renderer.rect( box.x - 3, box.y + 1, box.width + 6, box.height, 3 ).attr( {
                          fill: colorArr[i],
