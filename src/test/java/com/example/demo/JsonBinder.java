@@ -24,6 +24,7 @@ public class JsonBinder {
 	 * 注意，原来的版本使用的是Inclusion类型，现在替换为了Include
 	 * @param include
 	 */
+	@SuppressWarnings("deprecation")
 	public JsonBinder(Include include){
 		mapper = new ObjectMapper();
 		

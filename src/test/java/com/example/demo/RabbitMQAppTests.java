@@ -42,7 +42,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class RabbitMQAppTests {
-private static JsonBinder binder = JsonBinder.buildNormalBinder();
+	
+	private static JsonBinder binder = JsonBinder.buildNormalBinder();
 	
 	String lighturl= "https://open.hscloud.cn";
 	
@@ -105,7 +106,7 @@ private static JsonBinder binder = JsonBinder.buildNormalBinder();
 	@SuppressWarnings("unchecked")
 	public  Map<String, Object> commonCallData(String callUrl) {
 		Map<String, Object> resultmap = new HashMap<>();
-		String tokenStr = "FC480E7E8FAA47C891F8DB6D740DBC3D201801230600006064E5AD";// NXZLB_Token_KEY_STR
+		String tokenStr = "22AAB1A05FB8478989F1295C803B5B19201801300600006064E5AD";// NXZLB_Token_KEY_STR
 		// token不为空和接口中股票为必传项
 		if (!tokenStr.equals("")) {
 			String token = "bearer " + tokenStr;
