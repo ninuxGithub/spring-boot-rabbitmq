@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.bean.Order;
 import com.example.demo.repository.OrderRepository;
 
-
 @Service
 @Transactional
 public class OrderService {
@@ -17,10 +16,10 @@ public class OrderService {
 	@Autowired
 	private OrderRepository orderRepository;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW,isolation= Isolation.READ_COMMITTED)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
 	public void saveOrder(Order order) {
 		orderRepository.save(order);
-//		throw new RuntimeException("运行时异常");
+		throw new RuntimeException("运行时异常");
 	}
 
 }
