@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", 
 						transactionManagerRef = "transactionManager", 
 						basePackages = {"com.example.demo.repository" }) // 设置Repository所在位置
-public class JapConfig {
+public class TransactionConfig {
 	
 	@Autowired
 	@Qualifier("dataSource")
