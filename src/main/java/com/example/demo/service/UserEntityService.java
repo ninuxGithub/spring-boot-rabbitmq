@@ -28,17 +28,6 @@ import com.example.demo.repository.UserRepository;
 
 
 
-//事物成功总结
-//1、内外都无try Catch的时候，外部异常，全部回滚。
-//2、内外都无try Catch的时候，内部异常，全部回滚。
-//3、外部有try Catch时候，内部异常，全部回滚
-//4、内部有try Catch，外部异常，全部回滚
-//5、友情提示：外层方法中调取其他接口，或者另外开启线程的操作，一定放到最后！！！(因为调取接口不能回滚，一定要最后来处理)
-//
-//总结：由于上面的异常被捕获导致，很多事务回滚失败。如果一定要将捕获，请捕获后又抛出RuntimeException（默认为异常捕获RuntimeException）。
-
-
-
 /**
  * 无论调用的时候有没有try  --- 如果内部service 采用  propagation = Propagation.REQUIRED  外部抛出异常，都回滚
  * 
@@ -56,7 +45,10 @@ import com.example.demo.repository.UserRepository;
  * @author shenzm
  *
  */
+//PROPAGATION_REQUIRES_NEW: 会将现有的事物挂起，开启一个全新的事物，来完成事物的提交，不依赖外部的事物， 所以在内部记录提交到数据库的时候可能都没有执行到外部事物的相关的数据操作（没有保存数据）
 
+
+//PROPAGATION_NESTED: 内部事物对外部事物有依赖性，是外部事物的子事物， 不管内部事物有没有成功的提交，都会等待外部事物完成然后在一起提交或者回滚
 
 
 
@@ -86,7 +78,6 @@ public class UserEntityService {
 //		if(a == 1) {
 //			throw new RuntimeException("运行时异常");
 //		}
-		userRepository.save(userEntity);	
 		try {
 			Order order = new Order();
 			order.setPrice(100d);
@@ -95,6 +86,9 @@ public class UserEntityService {
 			System.err.println(e.getMessage());
 			System.out.println("如果orderService保存失败会回到savepoint");
 			System.out.println("do other service!!! ");
+		}finally {
+			userRepository.save(userEntity);	
+			System.out.println("run over");
 		}
 		
 	

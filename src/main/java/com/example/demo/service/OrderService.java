@@ -16,12 +16,12 @@ public class OrderService {
 	@Autowired
 	private OrderRepository orderRepository;
 
-	@Transactional(propagation = Propagation.NESTED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
 	public void saveOrder(Order order) {
-		int a =0; 
-		if(a==0) {
-			throw new RuntimeException("运行时异常");
-		}
+//		int a =0; 
+//		if(a==0) {
+//			throw new RuntimeException("运行时异常");
+//		}
 		orderRepository.save(order);
 	}
 
