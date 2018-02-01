@@ -5,16 +5,21 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "user_table")
 public class UserEntity implements Serializable {
 	private static final long serialVersionUID = 5954252966400830349L;
 
-	@Id
-//	 @GeneratedValue(strategy = GenerationType.AUTO)
+	 @Id
+	// @GeneratedValue(strategy = GenerationType.AUTO)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid") //
+	@GeneratedValue(generator = "system-uuid") // 用generator属性指定要使用的策略生成器。
 	private String id;
 	private String username;
 	private String name;
@@ -29,8 +34,8 @@ public class UserEntity implements Serializable {
 	public UserEntity() {
 	}
 
-	public UserEntity(String id, String username, String name, String phone, String email, Date create_time, boolean is_active,
-			String checkpass) {
+	public UserEntity(String id, String username, String name, String phone, String email, Date create_time,
+			boolean is_active, String checkpass) {
 		this.id = id;
 		this.username = username;
 		this.name = name;
@@ -110,7 +115,5 @@ public class UserEntity implements Serializable {
 		return "UserEntity [id=" + id + ", username=" + username + ", name=" + name + ", phone=" + phone + ", email="
 				+ email + ", createTime=" + createTime + ", is_active=" + is_active + ", checkpass=" + checkpass + "]";
 	}
-	
-	
 
 }
