@@ -42,11 +42,13 @@ public class MessageController {
 	public UserEntity index() {
 		UserEntity user = new UserEntity();
 		user.setName("测试事物");
-		try {
-			userService.saveUserEntity(user);
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
+		
+		userService.saveUserEntity(user);
+//		try {
+//			userService.saveUserEntity(user);
+//		} catch (Exception e) {
+//			System.err.println(e.getMessage());
+//		}
 		return user;
 	}
 
