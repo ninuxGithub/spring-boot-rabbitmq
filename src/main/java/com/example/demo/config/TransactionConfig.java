@@ -14,7 +14,7 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -32,11 +32,11 @@ public class TransactionConfig {
 
 	@Bean(name = "entityManager")
 	public EntityManager entityManager(EntityManagerFactoryBuilder builder) {
-		return oracleEntityManagerFactory(builder).getObject().createEntityManager();
+		return entityManagerFactory(builder).getObject().createEntityManager();
 	}
 
 	@Bean(name = "entityManagerFactory")
-	public LocalContainerEntityManagerFactoryBean oracleEntityManagerFactory(EntityManagerFactoryBuilder builder) {
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder) {
 		return builder.dataSource(persistDataSource).properties(getVendorProperties(persistDataSource))
 				.packages("com.example.demo.bean") // 设置实体类所在位置
 				.persistenceUnit("persistenceUnit").build();
@@ -55,6 +55,7 @@ public class TransactionConfig {
 
 	@Bean(name = "transactionManager")
 	public PlatformTransactionManager transactionManager(EntityManagerFactoryBuilder builder) {
-		return new JpaTransactionManager(oracleEntityManagerFactory(builder).getObject());
+		return new DataSourceTransactionManager(persistDataSource);
+		//return new JpaTransactionManager(entityManagerFactory(builder).getObject());//jap 事务管理器不支持nested transaction
 	}
 }

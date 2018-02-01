@@ -57,6 +57,20 @@ import com.example.demo.repository.UserRepository;
  *
  */
 
+
+
+
+//由此可见, PROPAGATION_REQUIRES_NEW 和 PROPAGATION_NESTED 的最大区别在于, PROPAGATION_REQUIRES_NEW 完全是一个新的事务, 
+//而 PROPAGATION_NESTED 则是外部事务的子事务, 如果外部事务 commit, 嵌套事务也会被 commit, 这个规则同样适用于 roll back. 
+//savePoint 概念
+//这种方式也是潜套事务最有价值的地方, 它起到了分支执行的效果, 如果 ServiceB.methodB 失败, 那么执行 ServiceC.methodC(), 
+//而 ServiceB.methodB 已经回滚到它执行之前的 SavePoint, 所以不会产生脏数据(相当于此方法从未执行过), 这种特性可以用在某些特殊的业务中, 
+//而 PROPAGATION_REQUIRED 和 PROPAGATION_REQUIRES_NEW 都没有办法做到这一点. 
+
+
+
+
+
 @Service
 @Transactional
 public class UserEntityService {
@@ -68,14 +82,21 @@ public class UserEntityService {
 	private OrderService orderService;
 	
 	public void saveUserEntity(UserEntity userEntity) {
+//		int a=1;
+//		if(a == 1) {
+//			throw new RuntimeException("运行时异常");
+//		}
 		userRepository.save(userEntity);	
-		Order order = new Order();
-		order.setPrice(100d);
-		orderService.saveOrder(order);
-		int a=1;
-		if(a == 1) {
-			throw new RuntimeException("运行时异常");
+		try {
+			Order order = new Order();
+			order.setPrice(100d);
+			orderService.saveOrder(order);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			System.out.println("如果orderService保存失败会回到savepoint");
+			System.out.println("do other service!!! ");
 		}
+		
 	
 	}
 	
