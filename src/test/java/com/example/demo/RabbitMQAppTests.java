@@ -29,6 +29,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
@@ -62,6 +64,15 @@ public class RabbitMQAppTests {
 		}
 		
 	}
+	
+	 @Bean  
+     public ThreadPoolTaskExecutor taskExecutor(){  
+             ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();  
+             pool.setCorePoolSize(5);  
+             pool.setMaxPoolSize(10);  
+             pool.setWaitForTasksToCompleteOnShutdown(true);  
+             return pool;  
+     }  
 
 	@SuppressWarnings("unchecked")
 	private static List<Map<String,Object>> initData() {
@@ -264,7 +275,6 @@ public class RabbitMQAppTests {
 				e.printStackTrace();
 			}
 		}
-		
 		pool.shutdown();
 	}
 	
