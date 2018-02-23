@@ -6,6 +6,11 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 
+/**
+ * 
+ * 需要修改： 自己的IP , rabbitmq 用户名 ， 密码， virtualHost 
+ * client也需要修改对应的地方
+ */
 @SuppressWarnings("deprecation")
 public class RPCServer {
 
