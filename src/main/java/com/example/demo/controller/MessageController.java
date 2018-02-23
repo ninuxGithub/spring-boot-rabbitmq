@@ -56,7 +56,7 @@ public class MessageController {
 
 	// http://localhost:8080/sendMsg
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value = "/sendMsg", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/sendMsg", method = { RequestMethod.GET})
 	public String sendMessage() {
 		List<UserEntity> users = userService.findAllUserEntity();
 		System.out.println("目标的集合的size："+ users.size());
