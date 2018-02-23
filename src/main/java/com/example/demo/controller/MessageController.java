@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +55,51 @@ public class MessageController {
 	}
 
 	// http://localhost:8080/sendMsg
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/sendMsg", method = { RequestMethod.GET, RequestMethod.POST })
 	public String sendMessage() {
 		List<UserEntity> users = userService.findAllUserEntity();
-		Map<String, UserEntity> callableCaculation = CallableUtil.callableCaculation("id", users);
-		System.out.println(callableCaculation == null);
+		System.out.println("目标的集合的size："+ users.size());
+		
+		//方法一
+		Map<String, UserEntity> callResult = CallableUtil.callableCaculation("id", users, 1L);
+		if(null != callResult) {
+//			for(String key: callResult.keySet()) {
+//				System.out.println("key is :"+ key +  "   value is : "+ callResult.get(key));
+//			}
+			
+			System.out.println("多线程返回的结果的size： "+callResult.size());
+		}
+		
+		//方法二
+		Map callResult2 = CallableUtil.callableCaculation(new Callable<Map>() {
+			
+			@Override
+			public Map call() throws Exception {
+				Map<String,UserEntity> map = new HashMap<>();
+				for(UserEntity user : users) {
+					map.put(user.getId(), user);
+				}
+				return map;
+			}
+		});
+		
+//		for (Object key : callResult2.keySet()) {
+//			System.out.println(key + " "+ callResult2.get(key));
+//		}
+		System.out.println("多线程返回的结果的size： "+callResult2.size());
+		
+		
+		
+		//代码完成
+		long start = System.currentTimeMillis();
+		Map<String,UserEntity> map = new HashMap<>();
+		for(UserEntity user : users) {
+			map.put(user.getId(), user);
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("main 消耗的时间是："+(end - start ) + "ms");
+		
 		return "index";
 	}
 
